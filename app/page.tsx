@@ -1,47 +1,37 @@
+'use client'
+
+import { useState } from 'react'
+
+type Step = {
+  eyebrow: string
+  title: string
+  description: string
+  bullets: string[]
+  question: string
+  visual: 'building' | 'mind' | 'domains' | 'tools' | 'contracts' | 'gateway'
+}
+
+const steps: Step[] = [
+  { eyebrow: '01 / O rascunho', title: 'Antes de erguer, desenhe a planta', description: 'Imagine um edifício sendo projetado. O monólito tenta levantar tudo de uma vez: mexer em um pilar pode trincar o teto inteiro.', bullets: ['Um único canteiro, uma única entrega, um único ponto de falha.', 'Microfrontends são plantas modulares: cada andar tem autonomia.', 'Um cômodo pode ser reformado sem interditar o prédio todo.'], question: 'Se a recepção precisasse de uma reforma hoje, você pararia o prédio inteiro?', visual: 'building' },
+  { eyebrow: '02 / O alicerce', title: 'O problema não é código. É a mente.', description: 'Nossa maior limitação ao construir software é a capacidade de entender o sistema que criamos. Complexidade chega em pequenas reformas — até ocupar todo o campo de visão.', bullets: ['Amplificação de mudanças: um ajuste atravessa vários times.', 'Carga cognitiva: cada pessoa precisa conhecer o prédio inteiro.', 'Desconhecidos: dependências invisíveis aparecem tarde demais.'], question: 'Quantos cômodos um arquiteto consegue manter na cabeça antes de começar a esquecer as conexões?', visual: 'mind' },
+  { eyebrow: '03 / As paredes', title: 'Domínios isolados, limites visíveis', description: 'O design nunca fica pronto. Ele evolui por incrementos. Por isso, cada domínio precisa de paredes claras e uma porta pública bem definida.', bullets: ['Domínios isolados: negócio, time e deploy caminham juntos.', 'APIs públicas estáveis: a porta não muda enquanto o cômodo evolui.', 'Fatias reutilizáveis: o que é comum vira fundação, não atalho secreto.'], question: 'Onde você colocaria a parede entre “Checkout” e “Catálogo” para impedir que a complexidade atravesse?', visual: 'domains' },
+  { eyebrow: '04 / As ferramentas', title: 'Escolha a ferramenta da obra', description: 'Não existe uma única planta universal. Module Federation e Web Components resolvem o mesmo problema por caminhos diferentes.', bullets: ['Module Federation: compartilha dependências e favorece performance; em troca, aumenta o acoplamento ao ecossistema.', 'Web Components: isolamento total e agnosticismo de framework; em troca, exige mais cuidado com integração e duplicação.', 'A escolha deve seguir as fronteiras do produto, não a moda do stack.'], question: 'Você prefere uma obra com ferramentas compartilhadas ou cômodos que funcionam até em outro prédio?', visual: 'tools' },
+  { eyebrow: '05 / A circulação', title: 'Contratos são portas. Dependências são corredores.', description: 'Um MFE não deve conhecer a implementação do vizinho. A comunicação acontece por contratos explícitos: entradas e saídas previsíveis.', bullets: ['Inputs: dados e configuração entram pela porta pública.', 'Outputs: eventos e intenções saem sem revelar como o cômodo funciona.', 'Regra de ouro: um MFE nunca chama outro MFE diretamente.'], question: 'Se um cômodo precisa atravessar a parede para pedir algo ao vizinho, a planta está bem modularizada?', visual: 'contracts' },
+  { eyebrow: '06 / A portaria', title: 'O prédio termina onde começa a infraestrutura', description: 'O visitante não precisa conhecer a planta interna. A portaria recebe, orienta e encaminha — enquanto os corredores revelam os próximos caminhos.', bullets: ['Reverse Proxy: direciona requisições para o MFE ou BFF correto.', 'HATEOAS: links funcionam como placas que descrevem ações e próximos recursos.', 'O frontend navega pelo que o backend oferece, sem carregar o mapa interno.'], question: 'Se amanhã um andar mudar de endereço, o visitante perceberia — ou apenas seguiria a próxima placa?', visual: 'gateway' },
+]
+
+function Blueprint({ type }: { type: Step['visual'] }) {
+  if (type === 'building') return <div className="building" aria-label="Diagrama de prédio modular"><div className="roof" /><div className="floor floor-one"><b>CATÁLOGO</b><span>andar independente</span></div><div className="floor floor-two"><b>CHECKOUT</b><span>reforma sem impacto</span></div><div className="floor floor-three"><b>CONTA</b><span>domínio isolado</span></div><div className="foundation">FUNDAÇÃO COMPARTILHADA</div></div>
+  if (type === 'mind') return <div className="mind-map" aria-label="Diagrama de complexidade crescente"><div className="brain">SISTEMA<br /><strong>?</strong></div><div className="orbit orbit-one">mudanças</div><div className="orbit orbit-two">dependências</div><div className="orbit orbit-three">desconhecidos</div><div className="blueprint-note">encapsular<br />complexidade</div></div>
+  if (type === 'domains') return <div className="domains" aria-label="Domínios isolados com APIs públicas"><div className="domain"><b>CATÁLOGO</b><span>API pública</span><i>●</i></div><div className="domain"><b>CHECKOUT</b><span>API pública</span><i>●</i></div><div className="domain"><b>CONTA</b><span>API pública</span><i>●</i></div><div className="wall-label">paredes claras / portas estáveis</div></div>
+  if (type === 'tools') return <div className="tools" aria-label="Comparação visual entre Module Federation e Web Components"><div><span className="tool-tag">01</span><b>MODULE<br />FEDERATION</b><small>dependências compartilhadas<br />+ performance</small></div><div className="versus">vs</div><div><span className="tool-tag alt">02</span><b>WEB<br />COMPONENTS</b><small>isolamento total<br />+ agnosticismo</small></div></div>
+  if (type === 'contracts') return <div className="contracts" aria-label="Fluxo de Inputs e Outputs entre MFEs"><div className="contract-box"><b>INPUT</b><span>dados / config</span></div><div className="contract-line"><span>contrato</span></div><div className="contract-box"><b>OUTPUT</b><span>evento / intenção</span></div><div className="no-entry">SEM<br />ACESSO<br />INTERNO</div></div>
+  return <div className="gateway" aria-label="Proxy reverso e navegação HATEOAS"><div className="gate"><b>PORTARIA</b><span>PROXY REVERSO</span></div><div className="corridor"><span>requisição</span><i /><i /><i /></div><div className="floors"><b>MFE A</b><b>BFF</b><b>MFE B</b></div><div className="sign">→ próxima ação<br />→ recurso disponível</div></div>
+}
+
 export default function Page() {
-  return (
-    <main
-      style={{
-        colorScheme: 'light dark',
-        position: 'relative',
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'light-dark(#fff, #000)',
-        color: 'light-dark(#000, #fff)',
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        style={{ width: 80, height: 80 }}
-        width={80}
-        height={80}
-        fill="none"
-        viewBox="0 0 20 20"
-        xmlns="http://www.w3.org/2000/svg"
-        stroke="currentColor"
-        strokeWidth="0.5"
-      >
-        <path
-          d="M14.2 14.2H17V6.9375C17 4.76288 15.2371 3 13.0625 3H5.8V5.8M14.2 14.2V7.79063L7.79062 14.2H14.2ZM14.2 14.2V17H6.9375C4.76288 17 3 15.2371 3 13.0625V5.8H5.8M5.8 5.8V12.2313L12.2313 5.8H5.8Z"
-          strokeLinejoin="round"
-        />
-      </svg>
-      <p
-        style={{
-          position: 'absolute',
-          left: '50%',
-          top: 'calc(50% + 56px)',
-          transform: 'translateX(-50%)',
-          whiteSpace: 'nowrap',
-          fontSize: '14px',
-          fontWeight: 500,
-          color: 'light-dark(#71717a, #a1a1aa)',
-        }}
-      >
-        Your v0 generation will show here.
-      </p>
-    </main>
-  )
+  const [current, setCurrent] = useState(0)
+  const step = steps[current]
+  const isLast = current === steps.length - 1
+  return <main className="workshop-shell"><header className="topbar"><div className="brand-mark">MFE<span>／</span>LAB</div><div className="session-label">WORKSHOP DE ARQUITETURA <span>● AO VIVO</span></div><div className="step-count">{String(current + 1).padStart(2, '0')} <span>/ 06</span></div></header><section className="progress" aria-label="Progresso do workshop">{steps.map((_, index) => <button key={index} aria-label={`Ir para etapa ${index + 1}`} className={index <= current ? 'active' : ''} onClick={() => setCurrent(index)} />)}</section><div className="content-grid"><section className="narrative"><p className="eyebrow">{step.eyebrow}</p><h1>{step.title}</h1><p className="lead">{step.description}</p><ul>{step.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul><div className="question"><span>PERGUNTA PARA A SALA</span><p>{step.question}</p></div><div className="nav-actions"><button className="back" onClick={() => setCurrent(Math.max(0, current - 1))} disabled={current === 0}>← voltar</button><button className="next" onClick={() => setCurrent(isLast ? 0 : current + 1)}>{isLast ? 'reiniciar workshop' : 'próxima planta'} <span>→</span></button></div></section><aside className="blueprint-panel"><div className="panel-top"><span>PLANTA / {String(current + 1).padStart(2, '0')}</span><span>ESCALA 1:100</span></div><Blueprint type={step.visual} /><div className="panel-caption"><span>rascunho de arquitetura</span><span>não desenhado em escala</span></div></aside></div><footer className="footer-note"><span>ARQUITETURA EVOLUTIVA</span><span>desenhe as fronteiras antes dos componentes</span></footer></main>
 }
